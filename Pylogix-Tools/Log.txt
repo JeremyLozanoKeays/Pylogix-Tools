@@ -1,0 +1,75 @@
+03-01-2022 16:15:43 - Changes Saved
+{'IP_Address': '10.10.100.5', 'XML_Source': '/Tag_Values.xml', 'Refresh_Rate': '500', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled'}
+03-01-2022 16:15:43 - Configuring PLC Settings
+03-01-2022 16:15:43 - Connection set: Disabled
+03-01-2022 16:15:59 - Changes Saved
+{'IP_Address': '10.10.100.50', 'XML_Source': '/Tag_Values.xml', 'Refresh_Rate': '500', 'Connection_Status': 2, 'Processor_Slot': 0, 'Is_Emulator': 'Enabled'}
+03-01-2022 16:16:07 - Connection set: Enabled
+03-01-2022 16:16:13 - Connection set: Disabled
+03-01-2022 23:28:11 - Changes Saved
+03-01-2022 23:28:54 - No existing file Creating - Config.txt
+03-01-2022 23:28:54 - Changes Saved
+{'IP_Address': '10.10.100.1', 'XML_Source': '/Tag_Values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 0, 'Is_Emulator': 'Disabled'}
+03-01-2022 23:28:54 - Configuring PLC Settings
+03-01-2022 23:28:54 - Connection set: Disabled
+03-01-2022 23:29:09 - Connection set: Enabled
+03-01-2022 23:31:36 - Changes Saved
+{'IP_Address': '10.10.100.1', 'XML_Source': '/Tag_Values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 0, 'Is_Emulator': 'Disabled'}
+03-01-2022 23:31:36 - Configuring PLC Settings
+03-01-2022 23:31:36 - Connection set: Disabled
+09-01-2022 10:33:44 - No existing file Creating - log.txt
+09-01-2022 10:34:05 - Changes Saved
+{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled'}
+09-01-2022 10:34:05 - Configuring PLC Settings
+09-01-2022 10:34:05 - Connection set: Disabled
+09-01-2022 10:34:15 - Connection set: Enabled
+09-01-2022 10:34:15 - Data Write Successful
+09-01-2022 10:34:15 - Data Write Successful
+09-01-2022 10:34:15 - Data Write Successful
+09-01-2022 10:34:30 - Value Error - Data must match Data Type 
+09-01-2022 10:34:30 - Data failed to write, Check Data Types
+09-01-2022 10:34:35 - Value Error - Data must match Data Type 
+09-01-2022 10:34:35 - Data failed to write, Check Data Types
+09-01-2022 10:34:40 - Value Error - Data must match Data Type 
+09-01-2022 10:34:40 - Data failed to write, Check Data Types
+09-01-2022 10:34:45 - Value Error - Data must match Data Type 
+09-01-2022 10:34:45 - Data failed to write, Check Data Types
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:34:50 - Data Write Successful
+09-01-2022 10:39:24 - Changes Saved
+{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled'}
+09-01-2022 10:39:24 - Configuring PLC Settings
+09-01-2022 10:39:24 - Connection set: Disabled
+09-01-2022 10:39:29 - Connection set: Enabled
+09-01-2022 10:39:29 - Data Write Successful
+09-01-2022 10:39:34 - Data failed to write, Check Data Types
+09-01-2022 10:39:34 - Data failed to write, Check Data Types
+09-01-2022 10:39:34 - Data failed to write, Check Data Types
+09-01-2022 10:39:34 - Data failed to write, Check Data Types
+09-01-2022 10:39:34 - Data failed to write, Check Data Types
+09-01-2022 10:39:59 - Connection set: Read-Only
+09-01-2022 10:39:59 - Data Read Successful
+09-01-2022 10:40:04 - Connection set: Enabled
+09-01-2022 10:40:04 - Data Write Successful
+09-01-2022 10:40:04 - Data Write Successful
+09-01-2022 10:40:04 - Data Write Successful
+09-01-2022 10:40:04 - Data Write Successful
+09-01-2022 10:40:24 - Connection set: Read-Only
+09-01-2022 10:40:24 - Data Read Successful
+09-01-2022 10:40:24 - Data Read Successful
+09-01-2022 10:40:34 - Connection set: Disabled
+09-01-2022 10:40:39 - Connection set: Enabled
+09-01-2022 10:40:39 - Data Write Successful
+09-01-2022 10:40:39 - Data Write Successful
+09-01-2022 10:40:39 - Data Write Successful
+09-01-2022 10:40:53 - Changes Saved
+{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled'}
+09-01-2022 10:40:54 - Connection set: Disabled
+09-01-2022 12:42:16 - Changes Saved
+{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '5000', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled'}
+09-01-2022 12:42:16 - Configuring PLC Settings
+09-01-2022 12:42:16 - Connection set: Disabled

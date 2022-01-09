@@ -547,3 +547,5 @@ if __name__ == "__main__":
     # Deplay application
     root.after(2000, app.plc_routine(True))
     root.mainloop()
+
+    #sync test

@@ -26,6 +26,9 @@ class App(ttk.Frame):
         self.var_3 = tk.IntVar(value=2) # Connection Enabled status
         self.var_4 = tk.IntVar(value=0) # Processor Slot
         self.var_5 = tk.StringVar(value="Disabled") #Is an Emulator
+        self.var_6 = tk.StringVar(value="Discover") #discovery
+        self.var_7 = tk.StringVar(value="Disabled") #Is a Micro 800
+
         self.img_1 = tk.PhotoImage(file='Logo_Shadow_Cropped.png').subsample(2, 2)
         self.console = Console(5)
         self.console_last = tk.StringVar(value="") # Consle store to prevent reprints
@@ -45,36 +48,44 @@ class App(ttk.Frame):
 
         # Logo
         self.logo = ttk.Label(self, image = self.img_1 )
-        self.logo.grid(row=0, column=0, padx=(20, 10), pady=(10, 20), sticky="nsew")
+        self.logo.grid(row=0, column=0, padx=(20, 10), pady=(10, 5), sticky="nsew")
 
         # Seperator
         self.separator_c1 = ttk.Separator(self)
-        self.separator_c1.grid(row=1, column=0, padx=(20, 10), pady=10, sticky="ew" )
+        self.separator_c1.grid(row=1, column=0, padx=(20, 10), pady=(0, 0), sticky="ew" )
 
         # Create a Frame for the Connection Radiobuttons
-        self.radio_frame = ttk.LabelFrame(self, text="Connection", padding=(20, 10))
-        self.radio_frame.grid(row=2, column=0, padx=(20, 10), pady=10, sticky="nsew")
+        self.radio_frame = ttk.LabelFrame(self, text="Connection", padding=(20, 10, 0, 10))
+        self.radio_frame.grid(row=2, column=0, padx=(20, 10), pady=5, sticky="ew")
 
         # Connection Radiobuttons
         self.radio_1 = ttk.Radiobutton(
-            self.radio_frame, text="Enabled", variable=self.var_3, value=1
+            self.radio_frame, text="Write Mode", variable=self.var_3, value=1
         )
         self.radio_1.grid(row=0, column=0, padx=5, pady=2, sticky="nsew")
         self.radio_2 = ttk.Radiobutton(
-            self.radio_frame, text="Disabled", variable=self.var_3, value=2
+            self.radio_frame, text="Read Mode", variable=self.var_3, value=3
         )
         self.radio_2.grid(row=1, column=0, padx=5, pady=2, sticky="nsew")
         self.radio_3 = ttk.Radiobutton(
-            self.radio_frame, text="Read only", variable=self.var_3, value=3
+            self.radio_frame, text="Disabled", variable=self.var_3, value=2
         )
-        self.radio_3.grid(row=3, column=0, padx=5, pady=2, sticky="nsew")
+        self.radio_3.grid(row=2, column=0, padx=5, pady=2, sticky="nsew")
+
+        # Discovery
+        # Save Changes button
+        self.discoverbutton = ttk.Button(
+            self, text="Discover all Tags", style="Accent.TButton"
+        )
+        self.discoverbutton.grid(row=4, column=0, padx=(20, 10), pady=(5, 5), sticky="nsew" )
+        self.discoverbutton['command'] = self.discover # Calls Save_Changes function on command
 
 
 # Middle Column
         # Create a Frame for input widgets
         self.widgets_frame = ttk.LabelFrame(self, text="Configuration", padding=(0, 0, 0, 10))
         self.widgets_frame.grid(
-            row=0, column=1, padx=10, pady=(30, 10), sticky="nsew", rowspan=3
+            row=0, column=1, padx=10, pady=(30, 10), sticky="nsew", rowspan=10
         )
         self.widgets_frame.columnconfigure(index=0, weight=1)
 
@@ -126,21 +137,33 @@ class App(ttk.Frame):
         )
         self.emulator_switch.grid(row=9, column=0, padx=20, pady=(0, 10), sticky="nsew")
 
+        # micro 800 button Label
+        self.emulator_entry_label = ttk.Label(self.widgets_frame, text="Micro 800")
+        self.emulator_entry_label.grid(row=10, column=0, padx=10, pady=(0, 2), sticky="ew")
+
+        # micro 800 button
+        self.emulator_switch = ttk.Checkbutton(
+            self.widgets_frame, textvariable=self.var_7, style="Toggle.TButton"
+            , variable=self.var_7, onvalue="Enabled", offvalue="Disabled"  # Var_5 updates display text
+
+        )
+        self.emulator_switch.grid(row=11, column=0, padx=20, pady=(0, 10), sticky="nsew")
+
         # Separator
         self.separator = ttk.Separator(self.widgets_frame)
-        self.separator.grid(row=10, column=0, padx=10, pady=10, sticky="ew" , columnspan=4)
+        self.separator.grid(row=12 , column=0, padx=10, pady=5, sticky="ew" , columnspan=4)
 
         # Save Changes button
         self.savebutton = ttk.Button(
             self.widgets_frame, text="Save Changes", style="Accent.TButton"
         )
-        self.savebutton.grid(row=15, column=0, padx=10, pady=10, sticky="nsew" )
+        self.savebutton.grid(row=15, column=0, padx=10, pady=(10, 0), sticky="nsew" )
         self.savebutton['command'] = self.save_changes # Calls Save_Changes function on command
 
 #Right Column
         # Panedwindow
         self.paned = ttk.PanedWindow(self)
-        self.paned.grid(row=0, column=2, pady=(35, 10), sticky="nsew", rowspan=3)
+        self.paned.grid(row=0, column=2, pady=(35, 10), sticky="nsew", rowspan=10)
 
         # Pane #1
         self.pane_1 = ttk.Frame(self.paned, padding=5)
@@ -156,15 +179,15 @@ class App(ttk.Frame):
             selectmode="browse",
             yscrollcommand=self.scrollbar.set,
             columns=(1, 2),
-            height=10,
+            height=12,
         )
         self.treeview.pack(expand=True, fill="both")
         self.scrollbar.config(command=self.treeview.yview)
 
         # Treeview columns
-        self.treeview.column("#0", anchor="w", width=120)
-        self.treeview.column(1, anchor="w", width=120)
-        self.treeview.column(2, anchor="w", width=120)
+        self.treeview.column("#0", anchor="w", width=280)
+        self.treeview.column(1, anchor="w", width=40)
+        self.treeview.column(2, anchor="w", width=60)
 
         # Treeview headings
         self.treeview.heading("#0", text="Tag Name", anchor="center")
@@ -289,19 +312,19 @@ class App(ttk.Frame):
             self.entryPopup = simpledialog.askstring('Change Value', "Current Tag Name: " + text, parent=self.treeview)
             if self.entryPopup != None:
                 self.treeview.delete(rowid)
-                self.treeview.insert('', index=(int(rowid)-1), iid=int(rowid), text=self.entryPopup , values=values)
+                self.treeview.insert('', index=(int(rowid)), iid=int(rowid), text=self.entryPopup , values=values)
         elif column == '#1':
             self.entryPopup = simpledialog.askstring('Change Value', "Current Value: " + values[0], parent=self.treeview)
             if self.entryPopup != None:
                 values_new = (self.entryPopup, values[1])
                 self.treeview.delete(rowid)
-                self.treeview.insert('', index=(int(rowid)-1), iid=int(rowid), text=text, values=values_new)
+                self.treeview.insert('', index=(int(rowid)), iid=int(rowid), text=text, values=values_new)
         elif column == '#2':
             self.entryPopup = simpledialog.askstring('Change Value', "Current Data Type: " + values[1], parent=self.treeview)
             if self.entryPopup != None:
                 values_new = (values[0], self.entryPopup)
                 self.treeview.delete(rowid)
-                self.treeview.insert('', index=(int(rowid)-1), iid=int(rowid), text=text, values=values_new)
+                self.treeview.insert('', index=(int(rowid)), iid=int(rowid), text=text, values=values_new)
                 
     
     def plc_routine(self, initialize=False):
@@ -382,7 +405,8 @@ class App(ttk.Frame):
             self.var_1.set(config_Settings['XML_Source']) # Set XML Filepath
             self.var_2.set(config_Settings['Refresh_Rate']) # Set Refresh Rate
             self.processor_entry.set(config_Settings['Processor_Slot']) # Processor Slot
-            self.var_5.set(config_Settings['Is_Emulator']) # Set Is Emulator            
+            self.var_5.set(config_Settings['Is_Emulator']) # Set Is Emulator
+            self.var_7.set(config_Settings['Is_Micro_800']) # Set Is Micro 800
         except:
             self.console.insert('No existing file Creating - Config.txt')
             config_File = open("Config.txt", "a+") # Create a new file 
@@ -404,6 +428,7 @@ class App(ttk.Frame):
             "Connection_Status" : self.var_3.get(),
             "Processor_Slot" : int(self.processor_entry.get()) ,
             "Is_Emulator" : self.var_5.get(),
+            "Is_Micro_800" : self.var_7.get(),
             }
         self.console.insert("Changes Saved")
 
@@ -412,7 +437,12 @@ class App(ttk.Frame):
         config_File.write(str(self.plc_config))
         config_File.close
         self.console.log(str(self.plc_config))
-    
+
+    def discover(self):
+        device = self.PLC.GetDeviceProperties().Value
+        self.console.insert('Discovered: '+ str(device.ProductName) + " v." + str(device.Revision))
+        tags = self.PLC.GetTagList()
+        self.repack_treeview(tags.Value, value_data=False)    
         
     def unpack_treeview(self):
         # Open XML containing File
@@ -437,20 +467,29 @@ class App(ttk.Frame):
             if item[0] == "" or item[1] in {8, 21}:
                 self.treeview.item(item[1], open=True)  # Open parents
 
-    def repack_treeview(self, read_data):
+    def repack_treeview(self, read_data, value_data=True):
         # Clear old tree
         for rowid in self.treeview.get_children():
             self.treeview.delete(rowid)
         # Create new rows
+        scope = []
         for data, newid in zip(read_data, range(len(read_data))):
-            if isinstance(data.Value, float):
-                data.Value = round(data.Value, 4)
-                data_type = "REAL"
-            elif isinstance(data.Value, str):
-                data_type = "STRING"
+            if value_data:
+                if isinstance(data.Value, float):
+                    data.Value = round(data.Value, 4)
+                    data_type = "REAL"
+                elif isinstance(data.Value, str):
+                    data_type = "STRING"
+                else:
+                    data_type = "DINT"
+                self.treeview.insert('', index="end", iid=int(newid), text=data.TagName, values=(data.Value, data_type))
             else:
-                data_type = "DINT"
-            self.treeview.insert('', index="end", iid=int(newid), text=data.TagName, values=(data.Value, data_type))
+                if not data.DataType: 
+                    scope.append(data.TagName)
+                elif data.DataType in ["DINT", "STRING", "REAL", "INT", "BOOL"]:
+                    self.treeview.insert('', index="end", iid=int(newid), text=data.TagName, values=(None, data.DataType))
+        if scope:
+            self.console.log('Programs Found: '+str(scope))
         
     def bottle_treeview(self, readonly=False):
         # Bottle treeview data for PLC delivery
@@ -528,7 +567,7 @@ class Console:
 
 if __name__ == "__main__":
     root = tk.Tk()
-    root.title("")
+    root.title("Pylogix - Tools")
 
     # Simply set the theme
     root.tk.call("source", "azure.tcl")
@@ -548,4 +587,3 @@ if __name__ == "__main__":
     root.after(2000, app.plc_routine(True))
     root.mainloop()
 
-    #sync test

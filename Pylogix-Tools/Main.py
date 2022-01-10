@@ -535,10 +535,11 @@ class Console:
         if app.console_last.get() != item :
             self.items.insert(0, now.strftime('%d-%m-%Y %H:%M:%S - ') + item)
             app.console_last.set(item)
+            self.log(self.items[0])
         if len(self.items) > self.size:
             self.out()
         self.refresh()
-        self.log(self.items[0])
+        
             
     def out(self):
         return self.items.pop()

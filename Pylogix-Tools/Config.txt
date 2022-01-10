@@ -1,1 +1,1 @@
-{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '500', 'Connection_Status': 2, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled', 'Is_Micro_800': 'Disabled'}
+{'IP_Address': '10.10.100.5', 'XML_Source': 'Tag_values.xml', 'Refresh_Rate': '500', 'Connection_Status': 3, 'Processor_Slot': 2, 'Is_Emulator': 'Enabled', 'Is_Micro_800': 'Disabled'}

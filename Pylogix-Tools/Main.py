@@ -200,7 +200,11 @@ class App(ttk.Frame):
         # Select and scroll
         self.treeview.selection_set(9)
         self.treeview.bind('<Double-1>', self.onDoubleClick)
+        self.treeview.bind("<Button-3>", self.onRightClick)
         self.treeview.see(7)
+
+        # Right click popup Menu
+
 
         # Notebook, pane #2
         self.pane_2 = ttk.Frame(self.paned, padding=5)
@@ -326,18 +330,25 @@ class App(ttk.Frame):
                 self.treeview.delete(rowid)
                 self.treeview.insert('', index=(int(rowid)), iid=int(rowid), text=text, values=values_new)
                 
-    
+    def onRightClick(self, event):
+        self.popup = tk.Menu(self,tearoff=0)
+        self.popup.add_command(label="Delete")
+        self.popup.add_separator()
+        self.popup.add_command(label="Trend")
+        try:
+            self.popup.tk_popup(event.x_root, event.y_root, 0)
+        finally:
+            self.popup.grab_release()
+            self.updated()
+
+    def updated(self):
+        print('this')
+
+
     def plc_routine(self, initialize=False):
         if initialize:
             self.plc_initialize()
         
-        # Use currently saved settings   
-        self.PLC.IPAddress = self.plc_config['IP_Address']
-        self.PLC.ProcessorSlot = self.plc_config['Processor_Slot']
-        if self.plc_config['Is_Emulator'] == 'Enabled':
-            self.PLC.ConnectionSize = 504
-        else:
-            self.PLC.ConnectionSize = 508
         # Connection is Enabled    
         if self.var_3.get() == 1:
             if self.flag != 1:
@@ -414,9 +425,10 @@ class App(ttk.Frame):
 
 
         finally:
+            self.PLC = pylogix.PLC()
             self.save_changes()
             self.console.insert('Configuring PLC Settings')
-            self.PLC = pylogix.PLC()
+
 
 
     def save_changes(self):
@@ -432,6 +444,17 @@ class App(ttk.Frame):
             }
         self.console.insert("Changes Saved")
 
+        # Use currently saved settings   
+        self.PLC.IPAddress = self.plc_config['IP_Address']
+        self.PLC.ProcessorSlot = self.plc_config['Processor_Slot']
+        if self.plc_config['Is_Micro_800'] == 'Enabled':
+            self.PLC.Micro800 = True
+        else:
+            self.PLC.Micro800 = False
+        if self.plc_config['Is_Emulator'] == 'Enabled':
+            self.PLC.ConnectionSize = 504
+        else:
+            self.PLC.ConnectionSize = 4002
         # Store settings as Config.txt
         config_File = open("Config.txt", "w")
         config_File.write(str(self.plc_config))
@@ -439,10 +462,13 @@ class App(ttk.Frame):
         self.console.log(str(self.plc_config))
 
     def discover(self):
-        device = self.PLC.GetDeviceProperties().Value
-        self.console.insert('Discovered: '+ str(device.ProductName) + " v." + str(device.Revision))
-        tags = self.PLC.GetTagList()
-        self.repack_treeview(tags.Value, value_data=False)    
+        try:
+            device = self.PLC.GetDeviceProperties().Value
+            self.console.insert('Discovered: '+ str(device.ProductName) + " v." + str(device.Revision))
+            tags = self.PLC.GetTagList()
+            self.repack_treeview(tags.Value, value_data=False)
+        except:
+            self.console.insert('Failed to discover tags - Check Settings')
         
     def unpack_treeview(self):
         # Open XML containing File

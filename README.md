@@ -5,6 +5,6 @@ Created by Jeremy Lozano-Keays
 
 ![Pylogix_Tools.png](https://user-images.githubusercontent.com/26181121/148882323-d8230f73-318d-4bed-8529-8a4a68e626c4.png)
 
-This uses:
+<h1><b>Credits</b></h1>
 - pylogix by dmroeder
 - Azure-ttk-theme by rdbende

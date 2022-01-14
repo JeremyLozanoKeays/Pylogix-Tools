@@ -1,53 +1,58 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version='1.0' encoding='utf-8'?>
 <Scope>
   <Tag>
     <Name>Tag_1</Name>
-    <Value>1111</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_2</Name>
-    <Value>2222</Value>
+    <Value>123</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_3</Name>
-    <Value>3333</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_4</Name>
-    <Value>4444</Value>
+    <Value>3334</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_5</Name>
-    <Value>5555</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_6</Name>
-    <Value>6666</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_7</Name>
-    <Value>7777</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_8</Name>
-    <Value>8888</Value>
+    <Value>0</Value>
     <DataType>DINT</DataType>
   </Tag>
   <Tag>
     <Name>Tag_9</Name>
-    <Value>94.9</Value>
+    <Value>0.0</Value>
     <DataType>REAL</DataType>
   </Tag>
   <Tag>
     <Name>Tag_10</Name>
-    <Value>tacos</Value>
+    <Value>this</Value>
     <DataType>STRING</DataType>
+  </Tag>
+  <Tag>
+    <Name>Program:MainProgram.scope_Tag</Name>
+    <Value>643</Value>
+    <DataType>DINT</DataType>
   </Tag>
 </Scope>

@@ -4,7 +4,10 @@ import pylogix
 import ast
 import datetime
 import xml.etree.cElementTree as et
-
+from xml.dom import minidom
+''' This is a tool that creates a simple GUI for pylogix. This will allow connections only to 
+    Rockwell ControlLogix, CompactLogix, and Micro800's PLCS.
+'''
 
 class App(ttk.Frame):
     def __init__(self, parent):
@@ -23,12 +26,12 @@ class App(ttk.Frame):
         self.var_0 = tk.StringVar(value="10.10.100.1")
         self.var_1 = tk.StringVar(value="Tag_values.xml")
         self.var_2 = tk.StringVar(value="5000") # Connection Refresh Rate
-        self.var_3 = tk.IntVar(value=2) # Connection Enabled status
+        self.var_3 = tk.IntVar(value=3) # Connection Enabled status
         self.var_4 = tk.IntVar(value=0) # Processor Slot
         self.var_5 = tk.StringVar(value="Disabled") #Is an Emulator
         self.var_6 = tk.StringVar(value="Discover") #discovery
         self.var_7 = tk.StringVar(value="Disabled") #Is a Micro 800
-
+        self.treedata = TreeData()
         self.img_1 = tk.PhotoImage(file='Logo_Shadow_Cropped.png').subsample(2, 2)
         self.console = Console(5)
         self.console_last = tk.StringVar(value="") # Consle store to prevent reprints
@@ -64,11 +67,11 @@ class App(ttk.Frame):
         )
         self.radio_1.grid(row=0, column=0, padx=5, pady=2, sticky="nsew")
         self.radio_2 = ttk.Radiobutton(
-            self.radio_frame, text="Read Mode", variable=self.var_3, value=3
+            self.radio_frame, text="Read Mode", variable=self.var_3, value=2
         )
         self.radio_2.grid(row=1, column=0, padx=5, pady=2, sticky="nsew")
         self.radio_3 = ttk.Radiobutton(
-            self.radio_frame, text="Disabled", variable=self.var_3, value=2
+            self.radio_frame, text="Disabled", variable=self.var_3, value=3
         )
         self.radio_3.grid(row=2, column=0, padx=5, pady=2, sticky="nsew")
 
@@ -91,7 +94,7 @@ class App(ttk.Frame):
 
         # IP address Entry Label
         self.ip_entry_label = ttk.Label(self.widgets_frame, text="IP Address")
-        self.ip_entry_label.grid(row=0, column=0, padx=10, pady=(0, 2), sticky="ew")
+        self.ip_entry_label.grid(row=0, column=0, padx=10, pady=(2, 2), sticky="ew")
 
         # IP addresss Entry
         self.ip_entry = ttk.Entry(self.widgets_frame, textvariable=self.var_0)
@@ -195,7 +198,7 @@ class App(ttk.Frame):
         self.treeview.heading(2, text="Data Type", anchor="center")
 
         # Define treeview data
-        self.unpack_treeview()
+        self.xml_to_treeview()
 
         # Select and scroll
         self.treeview.selection_set(9)
@@ -331,33 +334,40 @@ class App(ttk.Frame):
                 self.treeview.insert('', index=(int(rowid)), iid=int(rowid), text=text, values=values_new)
                 
     def onRightClick(self, event):
+        self.event = event
         self.popup = tk.Menu(self,tearoff=0)
-        self.popup.add_command(label="Delete")
+        self.popup.add_separator()
+        self.popup.add_command(label="Delete", command=self.onDelete)
         self.popup.add_separator()
         self.popup.add_command(label="Trend")
+        self.popup.add_separator()
         try:
             self.popup.tk_popup(event.x_root, event.y_root, 0)
+        except:
+            self.popup.grab_release()
         finally:
             self.popup.grab_release()
-            self.updated()
 
-    def updated(self):
-        print('this')
+    def onDelete(self):
+        # what row and column was clicked on
+        rowid = self.treeview.identify_row(self.event.y)
+        self.treeview.delete(rowid)
+
 
 
     def plc_routine(self, initialize=False):
         if initialize:
-            self.plc_initialize()
-        
+            self.plc_initialize()  
+      
         # Connection is Enabled    
         if self.var_3.get() == 1:
             if self.flag != 1:
                 self.console.insert('Connection set: Enabled')
                 self.flag = 1
-            write_data = self.bottle_treeview()            
+            self.bottle_treeview(self.treedata)            
             try:
                 fail = False
-                self.plc_status = self.PLC.Write(write_data)
+                self.plc_status = self.PLC.Write(self.treedata.write_data)
                 for i in self.plc_status:
                     if i.Status != 'Success':
                         fail = True
@@ -367,21 +377,16 @@ class App(ttk.Frame):
                     self.console.insert('Data Write Successful')
             except:
                 self.console.insert('Data failed to write, Check Data Types')
-        # Connection is Disabled
+        # Connection is Read-Only
         elif self.var_3.get() == 2:
             if self.flag != 2:
-                self.console.insert('Connection set: Disabled')
-                self.flag = 2
-        # Connection is Read-Only
-        elif self.var_3.get() == 3:
-            if self.flag != 3:
                 self.console.insert('Connection set: Read-Only')
-                self.flag = 3
-            read_data = self.bottle_treeview(readonly=True)
+                self.flag = 2
+            self.bottle_treeview(self.treedata, readonly=True)
             try:
                 fail = False
-                self.plc_status = self.PLC.Read(read_data)
-                self.repack_treeview(self.plc_status)
+                self.plc_status = self.PLC.Read(self.treedata.read_data)
+                self.update_treeview(self.plc_status)
                 for i in self.plc_status:
                     if i.Status != 'Success':
                         fail = True
@@ -391,6 +396,11 @@ class App(ttk.Frame):
                     self.console.insert('Data Read Successful')
             except:
                 self.console.insert('Data failed to send, Check Data Types')
+        # Connection is Disabled
+        elif self.var_3.get() == 3:
+            if self.flag != 3:
+                self.console.insert('Connection set: Disabled')
+                self.flag = 3
         
         # LOOP CALL - After Delay call plc_routine again       
         root.after(self.plc_config["Refresh_Rate"], self.plc_routine)
@@ -426,13 +436,13 @@ class App(ttk.Frame):
 
         finally:
             self.PLC = pylogix.PLC()
-            self.save_changes()
+            self.save_changes(True)
             self.console.insert('Configuring PLC Settings')
 
 
 
-    def save_changes(self):
-        # Write settings into PLC_Config
+    def save_changes(self, init=False):
+        # Get settings into PLC_Config dictionary
         self.plc_config = {
             "IP_Address" : self.var_0.get(),
             "XML_Source" : self.var_1.get(),
@@ -442,9 +452,8 @@ class App(ttk.Frame):
             "Is_Emulator" : self.var_5.get(),
             "Is_Micro_800" : self.var_7.get(),
             }
-        self.console.insert("Changes Saved")
 
-        # Use currently saved settings   
+        # Update PLC Setting from dictionary
         self.PLC.IPAddress = self.plc_config['IP_Address']
         self.PLC.ProcessorSlot = self.plc_config['Processor_Slot']
         if self.plc_config['Is_Micro_800'] == 'Enabled':
@@ -455,22 +464,32 @@ class App(ttk.Frame):
             self.PLC.ConnectionSize = 504
         else:
             self.PLC.ConnectionSize = 4002
+
         # Store settings as Config.txt
         config_File = open("Config.txt", "w")
         config_File.write(str(self.plc_config))
         config_File.close
         self.console.log(str(self.plc_config))
 
+        # SaveXMl
+        if not init:
+            self.write_to_xml(self.treedata.all_data)
+            self.console.insert("Changes Saved")
+
+
     def discover(self):
+        try:
+            tags = self.PLC.GetTagList()
+            self.update_treeview(tags.Value, value_data=False)
+        except:
+            self.console.insert('Failed to discover tags - Check Settings')
         try:
             device = self.PLC.GetDeviceProperties().Value
             self.console.insert('Discovered: '+ str(device.ProductName) + " v." + str(device.Revision))
-            tags = self.PLC.GetTagList()
-            self.repack_treeview(tags.Value, value_data=False)
         except:
-            self.console.insert('Failed to discover tags - Check Settings')
+            self.console.insert('Failed to discover device - Check Settings')
         
-    def unpack_treeview(self):
+    def xml_to_treeview(self):
         # Open XML containing File
         try:
             treeview_data = []
@@ -493,10 +512,10 @@ class App(ttk.Frame):
             if item[0] == "" or item[1] in {8, 21}:
                 self.treeview.item(item[1], open=True)  # Open parents
 
-    def repack_treeview(self, read_data, value_data=True):
-        # Clear old tree
+    def update_treeview(self, read_data, value_data=True):
+        # Update Treeview with changes
         for rowid in self.treeview.get_children():
-            self.treeview.delete(rowid)
+            self.treeview.delete(rowid) # Clear old tree
         # Create new rows
         scope = []
         for data, newid in zip(read_data, range(len(read_data))):
@@ -517,35 +536,68 @@ class App(ttk.Frame):
         if scope:
             self.console.log('Programs Found: '+str(scope))
         
-    def bottle_treeview(self, readonly=False):
-        # Bottle treeview data for PLC delivery
-        x = 0
-        tree_data =[]
+    def bottle_treeview(self, tree_data, readonly=False):
+        # CLear tree_data
+        tree_data.clear()
+        values = []
+        # Iterate through treeview children iids
         for x in self.treeview.get_children():  
-            values = []
             skip = False
-            # Retireves Value and Stats from Treeview
+            # Retireves Value and Datatype from Treeview
             for y in self.treeview.item(x,'values'):
-                values.append(y)
+                tree_data.values.append(y)
             # Retrieves Value from Treeview 
             if not readonly:
-                if values[1] == "STRING": # Builds the STRING, length is fixed at 25
-                    tree_data.append(tuple([self.treeview.item(x,'text') + '.LEN', len(values[0])]))
-                    values = [ord(c) for c in values[0]] + [0] * (25 - len(values[0]))
-                    tree_data.append(tuple([self.treeview.item(x,'text') + '.DATA[0]', values]))
+                if tree_data.values[-1] == "STRING": # Builds the STRING, length is fixed at 25
+                    tree_data.write_data.append(tuple([self.treeview.item(x,'text') + '.LEN', len(tree_data.values[-2])]))
+                    values = [ord(c) for c in tree_data.values[-2]] + [0] * (25 - len(tree_data.values[-2]))
+                    tree_data.write_data.append(tuple([self.treeview.item(x,'text') + '.DATA[0]', values]))
                     skip = True
-                elif values[1] == "REAL": # Builds the REAL
-                    values = [float(values[0])]
+                elif tree_data.values[-1] == "REAL": # Builds the REAL
+                    values = [float(tree_data.values[-2])]
                 else:
                     try:
-                        values = [int(values[0])]
+                        values = [int(tree_data.values[-2])]
                     except ValueError:
                         return
                 if not skip: # Skips append when STRING is selected.
-                    tree_data.append(tuple([self.treeview.item(x,'text'), values[0]]))
+                    tree_data.write_data.append(tuple([self.treeview.item(x,'text'), values[0]]))
             else:
-                tree_data.append(self.treeview.item(x,'text'))
+                tree_data.read_data.append(self.treeview.item(x,'text'))
+            # Build list of all treeview data
+            tree_data.all_data.append(tuple([self.treeview.item(x,'text'), tree_data.values[-2], tree_data.values[-1]]))
+            print(tree_data.write_data)
         return tree_data
+
+
+    def write_to_xml(self, treeview_data):
+        # Create new base element
+        scope = et.Element('Scope')
+        tag = et.SubElement(scope, 'Tag')
+        Name = et.SubElement(tag, 'Name')
+        Value = et.SubElement(tag, 'Value')
+        DataType = et.SubElement(tag, 'DataType')
+
+        # Create blank XML the size of treeview data
+        for i in range(len(treeview_data)):
+            if i > 0:
+                scope.append(tag)
+
+        # Convert XML to pretty formating and overwrite old file
+        reparsed = minidom.parseString(et.tostring(scope, "utf-8"))
+        tree = et.ElementTree(et.fromstring(reparsed.toprettyxml(indent="  ")))
+        root = tree.getroot()
+
+        # Ammend tree with Treeview data
+        for data, iter in zip(treeview_data, range(len(root.findall('Tag')))):
+            root[iter][0].text = str(data[0])
+            root[iter][1].text = str(data[1])
+            root[iter][2].text = str(data[2])
+        
+        # Write to XML
+        tree.write('Tag_values.xml', encoding="utf-8", xml_declaration=True)
+
+
 
 class Console:
     # Console FiFo
@@ -591,6 +643,20 @@ class Console:
         log_File.write(text + '\n')
         log_File.close
                     
+class TreeData:
+    # TreeData Class for reading writing and saving
+    def __init__(self):
+        self.values = []
+        self.read_data = []
+        self.write_data = []
+        self.all_data =[]
+
+    def clear(self):
+        self.values.clear()
+        self.read_data.clear()
+        self.write_data.clear()
+        self.all_data.clear()
+
 
 if __name__ == "__main__":
     root = tk.Tk()

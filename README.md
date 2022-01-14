@@ -5,6 +5,18 @@ Created by Jeremy Lozano-Keays
 
 ![Pylogix_Tools.png](https://user-images.githubusercontent.com/26181121/148882323-d8230f73-318d-4bed-8529-8a4a68e626c4.png)
 
+<h1><b>About</b></h1>
+This is a tool that creates a simple and intutive GUI for pylogix. This will allow connections only to Rockwell ControlLogix, CompactLogix, and Micro800's PLCS.  <br>
+
+
+<h1><b>Dependencies</b></h1>
+- Pylogix  <br>
+```
+$ pip install pylogix
+```
+- Azure-ttk-theme <br>
+
+
 <h1><b>Credits</b></h1>
 This application uses Open Source components. You can find the source code of the open source projects along with thier license information below. I acknowledge and am extremely grateful to these developersfor their contributions.<br>
 <br>

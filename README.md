@@ -10,11 +10,12 @@ This is a tool that creates a simple and intutive GUI for pylogix. This will all
 
 
 <h1><b>Dependencies</b></h1>
+
 - Pylogix  <br>
+
 ```
 $ pip install pylogix
 ```
-- Azure-ttk-theme <br>
 
 
 <h1><b>Credits</b></h1>
